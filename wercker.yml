@@ -1,0 +1,23 @@
+box: wercker/ruby
+build:
+  steps:
+    # Install dependencies defined in Gemfile
+    - bundle-install
+
+    # Execute jekyll doctor to validate the
+    # site against a list of known issues/deprecates.
+    - script:
+        name: jekyll doctor
+        code: bundle exec jekyll doctor
+
+    # Generate the jekyll site with trace information on.
+    # And store the result in the $WERCKER_OUTPUT_DIR, the
+    # directory that is shared with the deployment pipeline.
+    - script:
+        name: jekyll build
+        code: bundle exec jekyll build --trace --destination $WERCKER_OUTPUT_DIR
+deploy :
+  steps :
+    - lukevivier/gh-pages:
+        token: $GITHUB_TOKEN
+        basedir: .
